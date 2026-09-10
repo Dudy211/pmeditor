@@ -1,0 +1,473 @@
+/* ===== 工作区全屏提示层 ===== */
+.workspace-fs-prompt {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-primary);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 200;
+    text-align: center;
+    padding: 24px;
+    border-radius: 10px;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-fs-prompt.active {
+    display: flex;
+}
+
+.workspace-fs-prompt .wfp-icon {
+    font-size: 48px;
+    animation: pulsePhone 2s ease-in-out infinite;
+}
+
+@keyframes pulsePhone {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.workspace-fs-prompt .wfp-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.workspace-fs-prompt .wfp-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    max-width: 280px;
+    line-height: 1.6;
+}
+
+/* ===== 工作区全屏触发区（嵌在容器上） ===== */
+.workspace-fs-trigger {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 56px;
+    height: 56px;
+    z-index: 201;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-fs-trigger:focus {
+    outline: none;
+}
+
+/* 图标直接嵌在容器背景上，无独立按钮外观 */
+.workspace-fs-trigger::after {
+    content: '⛶';
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 18px;
+    opacity: 0.35;
+    transition: opacity 0.2s, color 0.2s;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* hover / active 时图标变亮 */
+.workspace-fs-trigger:hover::after,
+.workspace-fs-trigger:active::after {
+    opacity: 0.9;
+    color: var(--accent-primary);
+}
+
+/* ===== 左上角播放菜单触发区 ===== */
+.workspace-menu-trigger {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 44px;
+    height: 44px;
+    z-index: 201;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-menu-trigger:focus {
+    outline: none;
+}
+
+.workspace-menu-trigger::after {
+    content: '☰';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    opacity: 0.35;
+    transition: opacity 0.2s, color 0.2s;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-menu-trigger:hover::after,
+.workspace-menu-trigger:active::after {
+    opacity: 0.9;
+    color: var(--accent-primary);
+}
+
+/* 制谱器模式下隐藏左上角菜单触发器 */
+.workspace-inner.editor-mode .workspace-menu-trigger {
+    display: none;
+}
+
+/* ===== 播放菜单面板 ===== */
+.player-menu-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-menu-panel.active {
+    display: flex;
+}
+
+.player-menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.player-menu-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 301;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    min-width: 180px;
+}
+
+.player-menu-btn {
+    height: auto;
+    padding: 12px 32px;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.player-menu-btn:hover {
+    color: var(--accent-primary);
+    transform: scale(1.05);
+}
+
+.player-menu-btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== 工作区全屏状态 ===== */
+.workspace-inner.fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    z-index: 1000 !important;
+}
+
+/* 全屏时隐藏提示层 */
+.workspace-inner.fullscreen .workspace-fs-prompt {
+    display: none;
+}
+
+/* 全屏时隐藏模式选择器（制谱器模式下） */
+.workspace-inner.fullscreen .mode-selector {
+    display: none;
+}
+
+/* ===== 右上角重播触发区 ===== */
+.workspace-replay-trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    z-index: 201;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-replay-trigger:focus {
+    outline: none;
+}
+
+.workspace-replay-trigger::after {
+    content: '↻';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    opacity: 0.35;
+    transition: opacity 0.2s, color 0.2s;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-replay-trigger:hover::after,
+.workspace-replay-trigger:active::after {
+    opacity: 0.9;
+    color: var(--accent-primary);
+}
+
+/* ===== 右下角模式切换触发区 ===== */
+.workspace-mode-trigger {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    z-index: 201;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-mode-trigger:focus {
+    outline: none;
+}
+
+.workspace-mode-trigger::after {
+    content: '▶';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    opacity: 0.35;
+    transition: opacity 0.2s, color 0.2s;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.workspace-mode-trigger:hover::after,
+.workspace-mode-trigger:active::after {
+    opacity: 0.9;
+    color: var(--accent-primary);
+}
+
+.workspace-mode-trigger.editor::after {
+    content: '🎹';
+    font-size: 14px;
+}
+
+.workspace-mode-trigger.player::after {
+    content: '▶';
+}
+
+/* 调大全屏图标 */
+.workspace-fs-trigger::after {
+    font-size: 16px;
+}
+/* ===== 播放器过场面板 ===== */
+.player-intro-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 350;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+}
+
+.player-intro-panel.active {
+    display: flex;
+}
+
+.player-intro-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 32px;
+    text-align: center;
+}
+
+.player-intro-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    max-width: 80vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-intro-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.intro-meta-item {
+    background: var(--bg-tertiary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.player-intro-progress {
+    width: 200px;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.player-intro-progress-inner {
+    width: 0%;
+    height: 100%;
+    background: var(--accent-primary);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+}
+
+.player-intro-progress-inner.waiting {
+    animation: introPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes introPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.player-intro-loading {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.player-intro-panel.active .player-intro-loading {
+    opacity: 1;
+}
+
+/* ===== 播放器倒计时面板 ===== */
+.player-countdown-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 360;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.player-countdown-panel.active {
+    display: flex;
+}
+
+.player-countdown-number {
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--accent-primary);
+    text-shadow: 0 0 20px rgba(10, 132, 255, 0.4);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: none;
+}
+
+.player-countdown-number.pop {
+    animation: countdownPop 0.7s ease-out forwards;
+}
+
+@keyframes countdownPop {
+    0% { opacity: 0; transform: scale(0.5); }
+    20% { opacity: 1; transform: scale(1.2); }
+    80% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.8); }
+}

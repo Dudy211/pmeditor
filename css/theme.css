@@ -1,0 +1,62 @@
+/* ===== 白天模式 (默认) ===== */
+:root {
+    --bg-primary: #f5f5f7;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f0f0f2;
+    --bg-hover: #e8e8ec;
+    --bg-card: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #5a5a5e;
+    --text-tertiary: #86868b;
+    --border-color: #d2d2d7;
+    --accent-primary: #0071e3;
+    --accent-hover: #0077ed;
+    --accent-secondary: #34c759;
+    --shadow: rgba(0, 0, 0, 0.08);
+    --shadow-card: rgba(0, 0, 0, 0.06);
+    --selection: rgba(10, 132, 255, 0.15);
+
+    /* 网格线配色（白天模式） */
+    --grid-major: #9e9ea0;
+    --grid-major-text: #3a3a3c;
+    --grid-minor: #c7c7cc;
+    --grid-dot-major: #aeaeb2;
+    --grid-dot-minor: #d1d1d6;
+
+    color-scheme: light;
+}
+
+/* ===== 黑夜模式 ===== */
+[data-theme="dark"] {
+    --bg-primary: #0d0d0f;
+    --bg-secondary: #1c1c1e;
+    --bg-tertiary: #2c2c2e;
+    --bg-hover: #3a3a3c;
+    --bg-card: #1c1c1e;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a0a0a5;
+    --text-tertiary: #6e6e73;
+    --border-color: #38383a;
+    --accent-primary: #0a84ff;
+    --accent-hover: #409cff;
+    --accent-secondary: #30d158;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --shadow-card: rgba(0, 0, 0, 0.3);
+    --selection: rgba(10, 132, 255, 0.2);
+
+    /* 网格线配色（深色模式） */
+    --grid-major: #636366;
+    --grid-major-text: #c7c7cc;
+    --grid-minor: #48484a;
+    --grid-dot-major: #545456;
+    --grid-dot-minor: #3a3a3c;
+
+    color-scheme: dark;
+}
+
+body, body * {
+    transition: background-color 0.3s ease, 
+                border-color 0.3s ease, 
+                color 0.3s ease,
+                box-shadow 0.3s ease;
+}
