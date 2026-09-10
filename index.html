@@ -2,245 +2,231 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>缪斯计划制谱器</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-            margin: 0;
-            padding: 0;
-            min-width: 320px;
-            color: #333;
-            transition: background-color 0.3s, color 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        body.dark-mode {
-            background-color: #1a1a1a;
-            color: #f5f5f5;
-        }
-        .site-header {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            padding: 10px 0;
-            background-color: rgba(255, 255, 255, 0.95);
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        body.dark-mode .site-header {
-            background-color: rgba(26, 26, 26, 0.95);
-        }
-        .site-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 0;
-        }
-        .author {
-            text-align: center;
-            margin: 5px 0 0 0;
-            font-size: 12px;
-            color: #666;
-        }
-        body.dark-mode .author {
-            color: #aaa;
-        }
-        .theme-toggle {
-            position: fixed;
-            z-index: 100;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        body.dark-mode .theme-toggle {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .theme-toggle i {
-            color: inherit;
-            font-size: 16px;
-        }
-        body.dark-mode .theme-toggle i.fa-sun {
-            color: white;
-        }
-        body.light-mode .theme-toggle i.fa-moon {
-            color: black;
-        }
-        .content {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding-top: 10px;
-        }
-        .loading-bar {
-            width: 100%;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 10px;
-            text-align: center;
-        }
-        body.dark-mode .loading-bar {
-            background-color: #2d2d2d;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #ddd;
-            border-radius: 10px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        body.dark-mode .progress-bar {
-            background-color: #444;
-        }
-        .progress {
-            height: 100%;
-            width: 0%;
-            background-color: #4285f4;
-            transition: width 0.3s;
-        }
-        body.dark-mode .progress {
-            background-color: #64a7ff;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Project Muse 制谱器 - 变轨版</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/fullscreen.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/editor.css">
 </head>
-<body>
-    <div class="site-header">
-        <div class="site-title">缪斯计划制谱器</div>
-        <div class="author">Made by Dudy_211</div>
-    </div>
+<body data-theme="dark">
+    <header class="home-header">
+        <div class="header-left">
+            <h1 class="home-logo">🎵 Project Muse <span>Editor v2</span></h1>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-icon" id="btn-theme" title="切换主题">☀️</button>
+        </div>
+    </header>
 
-    <button class="theme-toggle" id="theme-toggle">
-        <i class="fas fa-moon" id="moon-icon"></i>
-        <i class="fas fa-sun" id="sun-icon" style="display: none;"></i>
-    </button>
+    <main class="home-main">
+        <div class="bar-row import-row">
+            <span class="row-label">导入</span>
+            <button class="bar-btn" id="upload-zip" title="上传谱面包 .pms（含谱面、音乐、皮肤）">
+                <span class="bb-icon">📦</span>
+                <span class="bb-text">谱面包</span>
+                <span class="bb-ext">.pms</span>
+            </button>
+            <button class="bar-btn" id="upload-pms" title="上传皮肤包 .zip">
+                <span class="bb-icon">🎨</span>
+                <span class="bb-text">皮肤</span>
+                <span class="bb-ext">.zip</span>
+            </button>
+            <button class="bar-btn" id="upload-music" title="上传音乐">
+                <span class="bb-icon">🎵</span>
+                <span class="bb-text">音乐</span>
+                <span class="bb-ext">audio</span>
+            </button>
+            <button class="bar-btn" id="upload-chart" title="上传谱面 .json">
+                <span class="bb-icon">📄</span>
+                <span class="bb-text">谱面</span>
+                <span class="bb-ext">.json</span>
+            </button>
+            <button class="bar-btn" id="export-chart" title="导出当前谱面 .json" disabled>
+                <span class="bb-icon">💾</span>
+                <span class="bb-text">导出</span>
+                <span class="bb-ext">.json</span>
+            </button>
+        </div>
 
-    <div class="content">
-        <div class="loading-bar" id="loading-bar">
-            <p id="loading-text">正在加载组件...</p>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
+        <div class="bar-row select-row">
+            <span class="row-label">选择</span>
+            <div class="dropdown-wrap">
+                <button class="bar-btn dropdown-btn" id="select-music-btn">
+                    <span class="bb-icon">🎵</span>
+                    <span class="bb-text dropdown-label" id="music-label">选择音乐</span>
+                    <span class="bb-arrow">▼</span>
+                </button>
+                <div class="dropdown-panel" id="music-panel">
+                    <div class="dp-search"><input type="text" placeholder="搜索音乐..." id="music-search"></div>
+                    <div class="dp-list" id="music-list"></div>
+                    <div class="dp-empty" id="music-empty">暂无音乐</div>
+                </div>
+            </div>
+            <div class="dropdown-wrap">
+                <button class="bar-btn dropdown-btn" id="select-chart-btn">
+                    <span class="bb-icon">📜</span>
+                    <span class="bb-text dropdown-label" id="chart-label">选择谱面</span>
+                    <span class="bb-arrow">▼</span>
+                </button>
+                <div class="dropdown-panel" id="chart-panel">
+                    <div class="dp-search"><input type="text" placeholder="搜索谱面..." id="chart-search"></div>
+                    <div class="dp-list" id="chart-list"></div>
+                    <div class="dp-empty" id="chart-empty">暂无谱面</div>
+                </div>
+            </div>
+            <div class="dropdown-wrap">
+                <button class="bar-btn dropdown-btn" id="select-skin-btn">
+                    <span class="bb-icon">🎨</span>
+                    <span class="bb-text dropdown-label" id="skin-label">选择皮肤</span>
+                    <span class="bb-arrow">▼</span>
+                </button>
+                <div class="dropdown-panel" id="skin-panel">
+                    <div class="dp-search"><input type="text" placeholder="搜索皮肤..." id="skin-search"></div>
+                    <div class="dp-list" id="skin-list"></div>
+                    <div class="dp-empty" id="skin-empty">暂无皮肤</div>
+                </div>
             </div>
         </div>
 
-        <div class="panel">
-            <buttons-section></buttons-section>
+        <div class="workspace" id="workspace">
+            <div class="workspace-inner" id="workspace-inner">
+                <div class="workspace-fs-prompt" id="workspace-fs-prompt">
+                    <div class="wfp-icon">⛶</div>
+                    <div class="wfp-title">请进入全屏模式</div>
+                    <div class="wfp-desc">双击左下角区域进入全屏</div>
+                </div>
+                <!-- 左上角播放菜单触发区（仅播放器模式有效） -->
+                <div class="workspace-menu-trigger" id="workspace-menu-trigger" title="双击打开播放菜单"></div>
+                <div class="workspace-fs-trigger" id="workspace-fs-trigger" title="双击切换全屏"></div>
+                <div class="workspace-replay-trigger" id="workspace-replay-trigger" title="双击重置"></div>
+                <div class="workspace-mode-trigger" id="workspace-mode-trigger" title="双击切换模式"></div>
+
+                <!-- 播放菜单面板 -->
+                <div class="player-menu-panel" id="player-menu-panel">
+                    <div class="player-menu-overlay"></div>
+                    <div class="player-menu-content">
+                        <button class="player-menu-btn" id="pm-btn-resume">▶ 继续</button>
+                        <button class="player-menu-btn" id="pm-btn-restart">↻ 重新开始</button>
+                    </div>
+                </div>
+
+                <!-- 过场面板 -->
+                <div class="player-intro-panel" id="player-intro-panel">
+                    <div class="player-intro-content">
+                        <div class="player-intro-title" id="player-intro-title">未知曲目</div>
+                        <div class="player-intro-meta" id="player-intro-meta"></div>
+                        <div class="player-intro-progress" id="player-intro-progress">
+                            <div class="player-intro-progress-inner" id="player-intro-progress-inner"></div>
+                        </div>
+                        <div class="player-intro-loading">加载中...</div>
+                    </div>
+                </div>
+
+                <!-- 倒计时面板 -->
+                <div class="player-countdown-panel" id="player-countdown-panel">
+                    <div class="player-countdown-number" id="player-countdown-number">3</div>
+                </div>
+
+                <!-- 结算界面 -->
+                <div class="result-overlay" id="result-overlay">
+                    <div class="result-card" id="result-card">
+                        <div class="result-title">歌曲完成</div>
+                        <div class="result-score-wrap">
+                            <div class="result-score" id="result-score">0</div>
+                            <div class="result-score-label">SCORE</div>
+                        </div>
+                        <div class="result-rank" id="result-rank">F</div>
+                        <div class="result-stats">
+                            <div class="result-stat perfect" id="rs-perfect">
+                                <span class="rs-label">PERFECT</span>
+                                <span class="rs-bar"><span class="rs-bar-inner"></span></span>
+                                <span class="rs-count">0</span>
+                            </div>
+                            <div class="result-stat good" id="rs-good">
+                                <span class="rs-label">GOOD</span>
+                                <span class="rs-bar"><span class="rs-bar-inner"></span></span>
+                                <span class="rs-count">0</span>
+                            </div>
+                            <div class="result-stat bad" id="rs-bad">
+                                <span class="rs-label">BAD</span>
+                                <span class="rs-bar"><span class="rs-bar-inner"></span></span>
+                                <span class="rs-count">0</span>
+                            </div>
+                            <div class="result-stat miss" id="rs-miss">
+                                <span class="rs-label">MISS</span>
+                                <span class="rs-bar"><span class="rs-bar-inner"></span></span>
+                                <span class="rs-count">0</span>
+                            </div>
+                        </div>
+                        <div class="result-meta">
+                            <div class="result-meta-item">
+                                <span class="rmi-label">最大连击</span>
+                                <span class="rmi-value" id="rs-maxcombo">0</span>
+                            </div>
+                            <div class="result-meta-item">
+                                <span class="rmi-label">准确率</span>
+                                <span class="rmi-value" id="rs-acc">0.00%</span>
+                            </div>
+                        </div>
+                        <div class="result-btns">
+                            <button class="result-btn primary" id="rs-btn-replay">↻ 重新游玩</button>
+                            <button class="result-btn" id="rs-btn-back">← 返回</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mode-selector" id="mode-selector">
+                    <div class="mode-title">选择模式</div>
+                    <div class="mode-btns">
+                        <button class="mode-btn" data-mode="editor" id="mode-editor">
+                            <span class="mode-icon">🎹</span>
+                            <span class="mode-name">制谱器</span>
+                        </button>
+                        <button class="mode-btn" data-mode="player" id="mode-player">
+                            <span class="mode-icon">▶</span>
+                            <span class="mode-name">播放器</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <!-- 容器组件的父元素 -->
-        <div id="huh-contain-container">
-            <huh-contain></huh-contain>
-        </div>
-    </div>
+    <footer class="home-footer">
+        <span id="status-text">就绪</span>
+    </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const themeToggle = document.getElementById('theme-toggle');
-            const moonIcon = document.getElementById('moon-icon');
-            const sunIcon = document.getElementById('sun-icon');
-            const loadingText = document.getElementById('loading-text');
-            const progress = document.getElementById('progress');
-            const loadingBar = document.getElementById('loading-bar');
-            const prefersDarkMode = window.localStorage.getItem('prefersDarkMode') === 'true';
+    <button class="mode-float" id="mode-float" title="双击切换模式" style="display:none">
+        <span class="mf-icon" id="mf-icon">🎹</span>
+        <span class="mf-name" id="mf-name">制谱器</span>
+    </button>
 
-            if (prefersDarkMode) {
-                document.body.classList.add('dark-mode');
-                moonIcon.style.display = 'none';
-                sunIcon.style.display = 'inline';
-            } else {
-                document.body.classList.add('light-mode');
-            }
 
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                document.body.classList.toggle('light-mode');
-                if (document.body.classList.contains('dark-mode')) {
-                    moonIcon.style.display = 'none';
-                    sunIcon.style.display = 'inline';
-                } else {
-                    moonIcon.style.display = 'inline';
-                    sunIcon.style.display = 'none';
-                }
-                window.localStorage.setItem('prefersDarkMode', document.body.classList.contains('dark-mode'));
-            });
+    <input type="file" accept=".pms" hidden id="input-zip">
+    <input type="file" accept=".zip" hidden id="input-pms">
+    <input type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,.aac" hidden id="input-music">
+    <input type="file" accept=".json" hidden id="input-chart">
 
-            const components = [
-                { name: '按钮组件', path: 'huh/buttons.js' },
-                { name: '容器组件', path: 'huh/container.js' },
-								{ name: '测试组件', path: 'huh/test/test.js' }								
-						];
-
-            let progressValue = 0;
-
-            function loadComponent(component) {
-                return new Promise(resolve => {
-                    loadingText.textContent = `正在加载: ${component.name}`;
-                    const script = document.createElement('script');
-                    script.src = component.path;
-                    script.onload = () => {
-                        progressValue += 33.33; // 假设有2个组件，则每个占50%
-                        progress.style.width = `${progressValue}%`;
-                        resolve();
-                    };
-                    script.onerror = () => {
-                        console.error(`加载组件失败: ${component.name}`);
-                        resolve(); // 继续加载下一个组件
-                    };
-                    document.head.appendChild(script);
-                });
-            }
-
-            async function loadAllComponents() {
-                try {
-                    for (const component of components) {
-                        await loadComponent(component);
-                    }
-                    loadingText.textContent = '所有组件加载完成!';
-                    progress.style.width = '100%';
-                    setTimeout(() => {
-                        loadingBar.remove();
-                    }, 1000);
-                } catch (error) {
-                    console.error('加载组件时发生错误:', error);
-                }
-            }
-
-            loadAllComponents();
-
-            function positionThemeToggle() {
-                const themeToggle = document.getElementById('theme-toggle');
-                const width = window.innerWidth;
-                const height = window.innerHeight;
-
-                const toggleWidth = 40;
-                const toggleHeight = 40;
-
-                const right = width - toggleWidth - 15;
-                const top = 15;
-
-                themeToggle.style.left = `${right}px`;
-                themeToggle.style.top = `${top}px`;
-                themeToggle.style.width = `${toggleWidth}px`;
-                themeToggle.style.height = `${toggleHeight}px`;
-                themeToggle.style.borderRadius = `${toggleWidth/2}px`;
-            }
-
-            positionThemeToggle();
-            window.addEventListener('resize', positionThemeToggle);
-        });
-    </script>
+    <script src="js/theme.js"></script>
+    <script src="js/fullscreen.js"></script>
+    <script src="js/editor/toolbar.js"></script>
+    <script src="js/editor/panels.js"></script>
+    <script src="js/editor/timeline.js"></script>
+    <script src="js/editor/timeline-grid.js"></script>
+    <script src="js/editor/timeline-track.js"></script>
+    <script src="js/editor/timeline-note.js"></script>
+    <script src="js/editor/footer.js"></script>
+    <script src="js/editor/bpm-analyzer.js"></script>
+    <script src="js/editor/song-info.js"></script>
+    <script src="js/editor/core.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/track-system.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/player-intro.js"></script>
+    <script src="js/player-countdown.js"></script>
+    <script src="js/local-charts.js"></script>
+    <script src="js/home.js"></script>
+    <div class="toast-container" id="toast-container"></div>
 </body>
 </html>
