@@ -115,6 +115,58 @@ EditorTimeline.renderTracks = function(state, width, height) {
                     }
                 });
                 linesLayer.appendChild(line);
+
+                // iOS 兼容：容器 touchstart 会 preventDefault 吞掉 click，
+                // 用 44px 透明命中条 + touchend 选中，touchstart 阻断冒泡避免容器处理
+                const hit = document.createElement('div');
+                hit.style.cssText = `
+                    position: absolute;
+                    top: ${segTopY}px;
+                    left: ${centerX}px;
+                    width: 44px;
+                    height: ${visibleHeight}px;
+                    transform: translateX(-50%);
+                    background: transparent;
+                    pointer-events: auto;
+                    cursor: pointer;
+                    z-index: 6;
+                    -webkit-tap-highlight-color: transparent;
+                `;
+                const selectTrack = () => {
+                    if (window.ChartEditor) {
+                        window.ChartEditor.state.activeTrack = i;
+                        this.render();
+                        EditorPanels.refreshTrackInfo();
+                    }
+                };
+                // 触摸：点按(≤10px) = 选中轨道；滑动 = 转发给容器做拖拽滚动
+                let _downX = 0, _downY = 0, _forwarding = false;
+                hit.addEventListener('touchstart', (ev) => {
+                    ev.stopPropagation(); // 阻止容器放置音符
+                    const t = ev.touches[0];
+                    _downX = t.clientX; _downY = t.clientY; _forwarding = false;
+                }, { passive: true });
+                hit.addEventListener('touchmove', (ev) => {
+                    const t = ev.touches[0];
+                    if (!_forwarding) {
+                        if (Math.hypot(t.clientX - _downX, t.clientY - _downY) <= 10) return;
+                        _forwarding = true;
+                        EditorTimeline._onPointerDown(t); // 补发按下，启动拖拽
+                    }
+                    EditorTimeline._onPointerMove(t);
+                }, { passive: true });
+                hit.addEventListener('touchend', (ev) => {
+                    if (_forwarding) {
+                        _forwarding = false;
+                        EditorTimeline._onPointerUp(ev.changedTouches[0]);
+                    } else {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        selectTrack();
+                    }
+                }, { passive: false });
+                hit.addEventListener('click', selectTrack);
+                linesLayer.appendChild(hit);
             }
         }
     }
@@ -187,13 +239,40 @@ EditorTimeline.renderTracks = function(state, width, height) {
             z-index: 10;
             text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);
         `;
-        label.addEventListener('click', () => {
+        const selectTrackByLabel = () => {
             if (window.ChartEditor) {
                 window.ChartEditor.state.activeTrack = i;
                 this.render();
                 EditorPanels.refreshTrackInfo();
             }
-        });
+        };
+        label.addEventListener('click', selectTrackByLabel);
+        // 触摸：点按 = 选中轨道；滑动 = 转发给容器做拖拽滚动
+        let _lDownX = 0, _lDownY = 0, _lForwarding = false;
+        label.addEventListener('touchstart', (ev) => {
+            ev.stopPropagation();
+            const t = ev.touches[0];
+            _lDownX = t.clientX; _lDownY = t.clientY; _lForwarding = false;
+        }, { passive: true });
+        label.addEventListener('touchmove', (ev) => {
+            const t = ev.touches[0];
+            if (!_lForwarding) {
+                if (Math.hypot(t.clientX - _lDownX, t.clientY - _lDownY) <= 10) return;
+                _lForwarding = true;
+                EditorTimeline._onPointerDown(t);
+            }
+            EditorTimeline._onPointerMove(t);
+        }, { passive: true });
+        label.addEventListener('touchend', (ev) => {
+            if (_lForwarding) {
+                _lForwarding = false;
+                EditorTimeline._onPointerUp(ev.changedTouches[0]);
+            } else {
+                ev.preventDefault();
+                ev.stopPropagation();
+                selectTrackByLabel();
+            }
+        }, { passive: false });
         this.trackOverlay.appendChild(label);
     }
 };
