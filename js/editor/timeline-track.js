@@ -159,10 +159,19 @@ EditorTimeline.renderTracks = function(state, width, height) {
                     if (_forwarding) {
                         _forwarding = false;
                         EditorTimeline._onPointerUp(ev.changedTouches[0]);
-                    } else {
-                        ev.preventDefault();
-                        ev.stopPropagation();
+                        return;
+                    }
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    const mode = window.ChartEditor ? window.ChartEditor.state.editorMode : 'place';
+                    if (mode === 'select') {
+                        // 选择模式：点按 = 选中轨道
                         selectTrack();
+                    } else {
+                        // 放置/删除模式：点按 = 转发容器，完成放音符/删音符
+                        const t = ev.changedTouches[0];
+                        EditorTimeline._onPointerDown(t);
+                        EditorTimeline._onPointerUp(t);
                     }
                 }, { passive: false });
                 hit.addEventListener('click', selectTrack);
@@ -267,10 +276,17 @@ EditorTimeline.renderTracks = function(state, width, height) {
             if (_lForwarding) {
                 _lForwarding = false;
                 EditorTimeline._onPointerUp(ev.changedTouches[0]);
-            } else {
-                ev.preventDefault();
-                ev.stopPropagation();
+                return;
+            }
+            ev.preventDefault();
+            ev.stopPropagation();
+            const mode = window.ChartEditor ? window.ChartEditor.state.editorMode : 'place';
+            if (mode === 'select') {
                 selectTrackByLabel();
+            } else {
+                const t = ev.changedTouches[0];
+                EditorTimeline._onPointerDown(t);
+                EditorTimeline._onPointerUp(t);
             }
         }, { passive: false });
         this.trackOverlay.appendChild(label);
