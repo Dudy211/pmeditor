@@ -11,6 +11,28 @@ const WorkspaceFullscreen = {
     menuPanel: null,
     workspaceInner: null,
 
+    /**
+     * 绑定双击手势：同时支持 dblclick 与触屏双触（iOS Safari 双击只触发缩放，不派发 dblclick）
+     */
+    _onDoubleGesture(el, handler) {
+        if (!el) return;
+        el.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            handler();
+        });
+        let lastTap = 0;
+        el.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 350) {
+                e.preventDefault(); // 阻止双击缩放/点击穿透
+                lastTap = 0;
+                handler();
+            } else {
+                lastTap = now;
+            }
+        }, { passive: false });
+    },
+
     init() {
         this.fsPrompt = document.getElementById('workspace-fs-prompt');
         this.fsTrigger = document.getElementById('workspace-fs-trigger');
@@ -20,9 +42,7 @@ const WorkspaceFullscreen = {
         this.modeTrigger = document.getElementById('workspace-mode-trigger');
         this.workspaceInner = document.getElementById('workspace-inner');
 
-        if (this.fsTrigger) {
-            this.fsTrigger.addEventListener('dblclick', () => this.toggleFullscreen());
-        }
+        this._onDoubleGesture(this.fsTrigger, () => this.toggleFullscreen());
 
         // 监听窗口大小变化（全屏/旋转时刷新播放器）
         window.addEventListener('resize', () => {
@@ -32,17 +52,11 @@ const WorkspaceFullscreen = {
             }
         });
 
-        if (this.menuTrigger) {
-            this.menuTrigger.addEventListener('dblclick', () => this.togglePlayerMenu());
-        }
+        this._onDoubleGesture(this.menuTrigger, () => this.togglePlayerMenu());
 
-        if (this.replayTrigger) {
-            this.replayTrigger.addEventListener('dblclick', () => this.resetEditor());
-        }
+        this._onDoubleGesture(this.replayTrigger, () => this.resetEditor());
 
-        if (this.modeTrigger) {
-            this.modeTrigger.addEventListener('dblclick', () => this.toggleMode());
-        }
+        this._onDoubleGesture(this.modeTrigger, () => this.toggleMode());
 
         // 播放菜单按钮
         const pmResume = document.getElementById('pm-btn-resume');
