@@ -9,7 +9,7 @@ html, body {
     height: 100%;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     overflow: hidden;
-    /* 全局禁用双击缩放，保留滚动 */
+    /* 全局禁用双击缩放（制谱器/播放器不允许缩放），保留滚动 */
     touch-action: manipulation;
 }
 
