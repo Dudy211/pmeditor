@@ -62,9 +62,11 @@ const ChartPlayer = {
     },
 
     _getAccPercent() {
-        const s = this.state, total = this._getTotalJudges();
-        if (!total) return '0.00';
-        const acc = (s.perfectCount * 100 + s.goodCount * 65) / total;
+        // 准确度 = 已判定音符的加权命中比例（Perfect=100, Good=65, Bad/Miss=0）
+        const s = this.state;
+        const judged = s.perfectCount + s.goodCount + s.badCount + s.missCount;
+        if (!judged) return '100.00';
+        const acc = (s.perfectCount * this.ACC_PERFECT_PCT + s.goodCount * this.ACC_GOOD_PCT) / judged;
         return Math.min(acc, 100).toFixed(2);
     },
     audioContext: null,
