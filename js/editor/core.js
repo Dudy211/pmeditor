@@ -60,7 +60,7 @@ const ChartEditor = {
         for (const note of this.state.notes) {
             if (note.id === switchNote.id) continue;
             if (note.time >= switchTime) {
-                const countAtNote = this.getTrackCountAtTime(note.time);
+                const countAtNote = this.getTrackCountAtTime(note.time, note.id);
                 if (note.track >= countAtNote) {
                     note.track = countAtNote - 1;
                     hasChange = true;

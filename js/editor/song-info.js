@@ -115,7 +115,7 @@ const SongInfoPanel = {
                 <div class="si-field-row">
                     <label class="si-field-label">BPM</label>
                     <input type="number" class="si-field-input" id="si-bpm-input"
-                        value="${bpm || ''}" min="30" max="300" step="1" placeholder="未设置">
+                        value="${bpm || ''}" min="30" max="114514" step="1" placeholder="未设置">
                     <button class="si-bpm-btn-inline" id="si-btn-search-bpm" title="在 songbpm.com 搜索">🔍</button>
                     <button class="si-bpm-btn-inline si-bpm-btn-accent" id="si-btn-analyze-bpm" title="自动分析 BPM">⚡</button>
                 </div>
@@ -178,7 +178,7 @@ const SongInfoPanel = {
                 }
                 let val = parseInt(raw, 10);
                 if (isNaN(val) || val < 30) val = 30;
-                if (val > 300) val = 300;
+                if (val > 114514) val = 114514;
                 if (ce) {
                     ce.state.bpm = val;
                     bpmInput.value = val;

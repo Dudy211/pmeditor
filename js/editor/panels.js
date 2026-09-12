@@ -30,7 +30,10 @@ const EditorPanels = {
                             <button data-snap="3">1/3</button>
                             <button data-snap="4">1/4</button>
                             <button data-snap="8">1/8</button>
-                            <button data-snap="16">1/16</button>
+                            <div class="rhythm-custom" id="rhythm-custom" title="自定义节奏分母 (1~32)">
+                                <span>1/</span>
+                                <input type="number" id="rhythm-custom-input" min="1" max="32" step="1" placeholder="N">
+                            </div>
                         </div>
                     </div>
                     <div class="note-type-control" id="note-type-control">
@@ -1802,10 +1805,33 @@ const EditorPanels = {
                 }
                 presets.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+                const customWrap = document.getElementById('rhythm-custom');
+                if (customWrap) customWrap.classList.remove('active');
                 if (window.ChartEditor) window.ChartEditor.state.snap = snap;
                 if (window.EditorTimeline) EditorTimeline.render();
             });
         });
+
+        // 自定义节奏：1/N，N 范围 1~32
+        const customWrap = document.getElementById('rhythm-custom');
+        const customInput = document.getElementById('rhythm-custom-input');
+        if (customInput) {
+            customInput.addEventListener('change', () => {
+                const showGrid = localStorage.getItem('muse-editor-show-grid') !== 'false';
+                if (!showGrid) {
+                    if (window.showToast) window.showToast('请先开启显示网格线', 'warning');
+                    return;
+                }
+                let n = parseInt(customInput.value, 10);
+                if (isNaN(n)) return;
+                n = Math.max(1, Math.min(32, Math.round(n)));
+                customInput.value = n;
+                presets.forEach(b => b.classList.remove('active'));
+                if (customWrap) customWrap.classList.add('active');
+                if (window.ChartEditor) window.ChartEditor.state.snap = n;
+                if (window.EditorTimeline) EditorTimeline.render();
+            });
+        }
     },
 
     refreshTrackInfo() {

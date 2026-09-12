@@ -139,14 +139,18 @@ EditorTimeline.renderTracks = function(state, width, height) {
                         EditorPanels.refreshTrackInfo();
                     }
                 };
-                // 触摸：点按(≤10px) = 选中轨道；滑动 = 转发给容器做拖拽滚动
-                let _downX = 0, _downY = 0, _forwarding = false;
+                // 触摸：仅"选择模式"拦截（点按=选中轨道，滑动=拖拽滚动）；
+                // 其他模式完全穿透，容器原生处理放置/删除/hold长按，避免同步转发破坏长按流程
+                let _own = false, _downX = 0, _downY = 0, _forwarding = false;
                 hit.addEventListener('touchstart', (ev) => {
-                    ev.stopPropagation(); // 阻止容器放置音符
+                    _own = window.ChartEditor && window.ChartEditor.state.editorMode === 'select';
+                    if (!_own) return;
+                    ev.stopPropagation();
                     const t = ev.touches[0];
                     _downX = t.clientX; _downY = t.clientY; _forwarding = false;
                 }, { passive: true });
                 hit.addEventListener('touchmove', (ev) => {
+                    if (!_own) return;
                     const t = ev.touches[0];
                     if (!_forwarding) {
                         if (Math.hypot(t.clientX - _downX, t.clientY - _downY) <= 10) return;
@@ -156,22 +160,14 @@ EditorTimeline.renderTracks = function(state, width, height) {
                     EditorTimeline._onPointerMove(t);
                 }, { passive: true });
                 hit.addEventListener('touchend', (ev) => {
+                    if (!_own) return;
                     if (_forwarding) {
                         _forwarding = false;
                         EditorTimeline._onPointerUp(ev.changedTouches[0]);
-                        return;
-                    }
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    const mode = window.ChartEditor ? window.ChartEditor.state.editorMode : 'place';
-                    if (mode === 'select') {
-                        // 选择模式：点按 = 选中轨道
-                        selectTrack();
                     } else {
-                        // 放置/删除模式：点按 = 转发容器，完成放音符/删音符
-                        const t = ev.changedTouches[0];
-                        EditorTimeline._onPointerDown(t);
-                        EditorTimeline._onPointerUp(t);
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        selectTrack();
                     }
                 }, { passive: false });
                 hit.addEventListener('click', selectTrack);
@@ -256,14 +252,17 @@ EditorTimeline.renderTracks = function(state, width, height) {
             }
         };
         label.addEventListener('click', selectTrackByLabel);
-        // 触摸：点按 = 选中轨道；滑动 = 转发给容器做拖拽滚动
-        let _lDownX = 0, _lDownY = 0, _lForwarding = false;
+        // 触摸：仅"选择模式"拦截；其他模式完全穿透（同命中条）
+        let _lOwn = false, _lDownX = 0, _lDownY = 0, _lForwarding = false;
         label.addEventListener('touchstart', (ev) => {
+            _lOwn = window.ChartEditor && window.ChartEditor.state.editorMode === 'select';
+            if (!_lOwn) return;
             ev.stopPropagation();
             const t = ev.touches[0];
             _lDownX = t.clientX; _lDownY = t.clientY; _lForwarding = false;
         }, { passive: true });
         label.addEventListener('touchmove', (ev) => {
+            if (!_lOwn) return;
             const t = ev.touches[0];
             if (!_lForwarding) {
                 if (Math.hypot(t.clientX - _lDownX, t.clientY - _lDownY) <= 10) return;
@@ -273,20 +272,14 @@ EditorTimeline.renderTracks = function(state, width, height) {
             EditorTimeline._onPointerMove(t);
         }, { passive: true });
         label.addEventListener('touchend', (ev) => {
+            if (!_lOwn) return;
             if (_lForwarding) {
                 _lForwarding = false;
                 EditorTimeline._onPointerUp(ev.changedTouches[0]);
-                return;
-            }
-            ev.preventDefault();
-            ev.stopPropagation();
-            const mode = window.ChartEditor ? window.ChartEditor.state.editorMode : 'place';
-            if (mode === 'select') {
-                selectTrackByLabel();
             } else {
-                const t = ev.changedTouches[0];
-                EditorTimeline._onPointerDown(t);
-                EditorTimeline._onPointerUp(t);
+                ev.preventDefault();
+                ev.stopPropagation();
+                selectTrackByLabel();
             }
         }, { passive: false });
         this.trackOverlay.appendChild(label);
