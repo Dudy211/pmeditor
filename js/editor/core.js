@@ -803,19 +803,42 @@ const ChartEditor = {
             zip.file('meta.yaml', Object.entries(meta).map(([k, v]) => `${k}: ${v}`).join('\n'));
 
             const blob = await zip.generateAsync({ type: 'blob' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = ((meta.songName && meta.songName !== 'Untitled') ? meta.songName : chartName.replace(/\.json$/i, '')) + '.pms';
-            a.click();
-            URL.revokeObjectURL(url);
+            const fileName = ((meta.songName && meta.songName !== 'Untitled') ? meta.songName : chartName.replace(/\.json$/i, '')) + '.pms';
+            await this._downloadBlob(blob, fileName, 'application/zip');
 
-            if (window.showToast) window.showToast('谱面包已导出: ' + a.download, 'success');
-            if (window.setStatus) window.setStatus('已导出谱面包: ' + a.download);
+            if (window.showToast) window.showToast('谱面包已导出: ' + fileName, 'success');
+            if (window.setStatus) window.setStatus('已导出谱面包: ' + fileName);
         } catch (e) {
             console.error(e);
             if (window.showToast) window.showToast('谱面包导出失败', 'error');
         }
+    },
+
+    /**
+     * 跨平台文件下载：
+     * - 支持 Web Share API 的环境（iOS Safari 15+ 等）→ 调起系统分享面板，可"存储到文件"
+     * - 其他环境 → a[download] + blob URL，延迟撤销 URL 避免下载被中断
+     */
+    async _downloadBlob(blob, fileName, mime) {
+        const file = new File([blob], fileName, { type: mime || blob.type || 'application/octet-stream' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({ files: [file], title: fileName });
+                return 'share';
+            } catch (e) {
+                if (e && e.name === 'AbortError') return 'cancelled'; // 用户取消，不当作错误
+                console.warn('系统分享失败，回退直接下载:', e);
+            }
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        return 'download';
     },
 
     async exportZipPackage(pkg, data) {
@@ -861,12 +884,7 @@ const ChartEditor = {
             zip.file('meta.yaml', metaLines.join('\n'));
 
             const blob = await zip.generateAsync({ type: 'blob' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = pkg.name || 'package.zip';
-            a.click();
-            URL.revokeObjectURL(url);
+            await this._downloadBlob(blob, pkg.name || 'package.zip', 'application/zip');
 
             if (window.showToast) window.showToast('谱面包已导出', 'success');
             if (window.setStatus) window.setStatus('已导出谱面包: ' + (pkg.name || 'package.zip'));
